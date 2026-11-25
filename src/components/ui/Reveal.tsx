@@ -1,0 +1,42 @@
+'use client';
+
+import { motion, useReducedMotion } from 'framer-motion';
+import type { ReactNode } from 'react';
+
+/**
+ * Staggered fade-up reveal used on every section.
+ * Respects prefers-reduced-motion (renders static content).
+ */
+export function Reveal({
+  children,
+  delay = 0,
+  y = 24,
+  className,
+  as: Tag = 'div',
+}: {
+  children: ReactNode;
+  delay?: number;
+  y?: number;
+  className?: string;
+  as?: 'div' | 'section' | 'li' | 'article' | 'header';
+}) {
+  const reduce = useReducedMotion();
+  const MotionTag = motion[Tag] as typeof motion.div;
+
+  if (reduce) {
+    const Static = Tag as 'div';
+    return <Static className={className}>{children}</Static>;
+  }
+
+  return (
+    <MotionTag
+      className={className}
+      initial={{ opacity: 0, y }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: '-60px' }}
+      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </MotionTag>
+  );
+}
